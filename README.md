@@ -10,21 +10,20 @@ fine with VirtualBox 4.2.16 and Vagrant 1.4.3.
 
 1.  Clone the repository:
 
-```shell
-$ git clone git@github.com:wernerandrew/jedi-starter.git
-```
+        ```shell
+        $ git clone git@github.com:wernerandrew/jedi-starter.git
+        ```
 
 2.  Provision the VM and ssh in:
 
-```shell
-$ cd jedi-starter
-$ vagrant up
-$ vagrant ssh
-```
+        ```shell
+        $ cd jedi-starter
+        $ vagrant up
+        $ vagrant ssh
+        ```
 
-The provisioning step will softlink `~/.emacs` in the VM to
-`jedi-starter.el` in your shared directory.  You can tweak
-that file to figure.
+        The provisioning step will softlink `~/.emacs` in the VM to
+`jedi-starter.el` in your shared directory.
 
 3.  Open Emacs, which should install the packages.
 
@@ -36,7 +35,7 @@ This version includes my (Drew) preferred keybindings for
 jedi-mode.  Additionally, the in-function tooltip pops up
 only on demand (a bit of a hack, via the `jedi:get-in-function-call-delay`
 variable).  If you want to stick with the defaults, you can comment out
-or remove the following lines from jedi-start.el jedi
+or remove the following lines from jedi-starter.el:
 
 ``` lisp
 (setq jedi:get-in-function-call-delay 10000000)
