@@ -6,8 +6,7 @@
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-(defvar local-packages
-  '(auto-complete epc jedi projectile))
+(defvar local-packages '(auto-complete epc jedi))
 
 (defun uninstalled-packages (packages)
   (delq nil
@@ -159,15 +158,16 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
       (add-hook 'python-mode-hook
                 'jedi-config:set-python-executable))
 
+    ;; And custom keybindings
+    (defun jedi-config:setup-keys ()
+      (local-set-key (kbd "M-.") 'jedi:goto-definition)
+      (local-set-key (kbd "M-,") 'jedi:goto-definition-pop-marker)
+      (local-set-key (kbd "M-?") 'jedi:show-doc)
+      (local-set-key (kbd "M-/") 'jedi:get-in-function-call))
+
     ;; Don't let tooltip show up automatically
     (setq jedi:get-in-function-call-delay 10000000)
+    ;; Use custom keybinds
+    (add-hook 'python-mode-hook 'jedi-config:setup-keys)
 
-    ;; And custom keybindings
-    (add-hook
-     'python-mode-hook
-     '(lambda ()
-        (local-set-key (kbd "M-.") 'jedi:goto-definition)
-        (local-set-key (kbd "M-,") 'jedi:goto-definition-pop-marker)
-        (local-set-key (kbd "M-?") 'jedi:show-doc)
-        (local-set-key (kbd "M-/") 'jedi:get-in-function-call)))
     ))
