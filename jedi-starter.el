@@ -26,8 +26,8 @@
 ;; Global Jedi config vars
 
 (defvar jedi-config:use-system-python nil
-  "Set to non-nil if not using jedi:install-server.
-Will use system python and active environment for Jedi server.")
+  "Will use system python and active environment for Jedi server.
+May be necessary for some GUI environments (e.g., Mac OS X)")
 
 (defvar jedi-config:with-virtualenv nil
   "Set to non-nil to point to a particular virtualenv.")
