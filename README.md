@@ -6,7 +6,7 @@ virtual machine.  You'll need Vagrant and VirtualBox to get this
 working.  I haven't checked exhaustively, but it seems to work
 fine with VirtualBox 4.2.16 and Vagrant 1.4.3.
 
-** Installation
+### Installation
 
 1.  Clone the repository:
 
@@ -30,7 +30,7 @@ that file to figure.
 
 4.  Execute `M-x jedi:install-server` from within Emacs.
 
-** Using Jedi
+### Using Jedi
 
 This version includes my (Drew) preferred keybindings for
 jedi-mode.  Additionally, the in-function tooltip pops up
