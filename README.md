@@ -10,24 +10,21 @@ fine with VirtualBox 4.2.16 and Vagrant 1.4.3.
 
 1.  Clone the repository:
 
-        ```shell
         $ git clone git@github.com:wernerandrew/jedi-starter.git
-        ```
 
 2.  Provision the VM and ssh in:
 
-        ```shell
         $ cd jedi-starter
         $ vagrant up
         $ vagrant ssh
-        ```
-
-        The provisioning step will softlink `~/.emacs` in the VM to
-`jedi-starter.el` in your shared directory.
 
 3.  Open Emacs, which should install the packages.
 
 4.  Execute `M-x jedi:install-server` from within Emacs.
+
+The provisioning step will softlink `~/.emacs` in the VM to
+`jedi-starter.el` in your shared directory.  You can edit that
+file if you want to try out tweaks to the default config.
 
 ### Using Jedi
 
