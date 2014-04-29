@@ -24,7 +24,7 @@ curl -XGET -O http://repo.or.cz/w/emacs.git/blob_plain/1a0a666f941c99882093d7bd0
 sudo chown -R vagrant:vagrant $VAGRANT_HOME/.emacs.d
 
 # link to our .emacs file
-sudo -u vagrant ln -s $VAGRANT_HOME/.emacs /vagrant/jedi-starter.el
+sudo -u vagrant ln -s /vagrant/jedi-starter.el $VAGRANT_HOME/.emacs
 
 # get emacs
 $INSTALL emacs

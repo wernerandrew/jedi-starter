@@ -1,6 +1,6 @@
-;; Package housekeeping
+;; Package setup
 
-(add-to-list 'load-path "~/.emacs.d")
+(add-to-list 'load-path "~/.emacs.d") ; to find Emacs 23 package.el
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
@@ -23,12 +23,14 @@
       (dolist (p need-to-install)
 	(package-install p)))))
 
+;; Global Jedi config vars
+
 (defvar jedi-config:use-system-python nil
   "Set to non-nil if not using jedi:install-server.
 Will use system python and active environment for Jedi server.")
 
-(defvar jedi-config:add-system-virtualenv t
-  "Set to non-nil to also point Jedi towards the active $VIRTUAL_ENV, if any")
+(defvar jedi-config:with-virtualenv nil
+  "Set to non-nil to point to a particular virtualenv.")
 
 ;; Small helper to scrape text from shell output
 (defun get-shell-output (cmd)
@@ -44,11 +46,6 @@ Will use system python and active environment for Jedi server.")
   (let ((path-from-shell (get-shell-output "$SHELL --login -i -c 'echo $PATH'")))
     (setenv "PATH" path-from-shell)
     (setq exec-path (split-string path-from-shell path-separator))))
-
-;; Helper to get virtualenv from shell
-(defun get-active-virtualenv ()
-  (let ((venv (get-shell-output "$SHELL -c 'echo $VIRTUAL_ENV'")))
-    (if (> (length venv) 0) venv nil)))
 
 (add-hook
  'after-init-hook
@@ -113,62 +110,64 @@ Will use system python and active environment for Jedi server.")
           vc-root-dir))) ;; default to vc root if init file not given
 
     ;; And some customizations
-    (defvar vcs-root-sentinel ".git")
-    (defvar python-module-sentinel "__init__.py")
+    (defvar jedi-config:vcs-root-sentinel ".git")
+    (defvar jedi-config:python-module-sentinel "__init__.py")
 
     ;; This function sets how project root is determined
     (defun current-buffer-project-root ()
       (get-project-root-with-file
-       (current-buffer) vcs-root-sentinel python-module-sentinel))
+       (current-buffer)
+       jedi-config:vcs-root-sentinel
+       jedi-config:python-module-sentinel))
 
     (defun jedi-config:setup-server-args ()
       ;; little helper macro for building the arglist
       (defmacro add-args (arg-list arg-name arg-value)
         `(setq ,arg-list (append ,arg-list (list ,arg-name ,arg-value))))
       ;; and now define the args
-      (let ((project-root (current-buffer-project-root))
-            (active-venv (get-active-virtualenv)))
+      (let ((project-root (current-buffer-project-root)))
+
         (make-local-variable 'jedi:server-args)
 
         (when project-root
           (message (format "Adding system path: %s" project-root))
           (add-args jedi:server-args "--sys-path" project-root))
 
-        (when (and jedi-config:add-system-virtualenv active-venv)
-          (message (format "Adding system virtualenv: %s" active-venv))
-          (add-args jedi:server-args "--virtual-env" active-venv))))
+        (when jedi-config:with-virtualenv
+          (message (format "Adding virtualenv: %s" jedi-config:with-virtualenv))
+          (add-args jedi:server-args "--virtual-env" jedi-config:with-virtualenv))))
 
     ;; Use system python
-    (defun jedi-config:maybe-use-system-python ()
-      (when jedi-config:use-system-python
-        (set-exec-path-from-shell-PATH)
-        (make-local-variable 'jedi:server-command)
-        (set 'jedi:server-command
-             (list (executable-find "python") ;; may need help if running from GUI
-                   (cadr default-jedi-server-command)))))
+    (defun jedi-config:set-python-executable ()
+      (set-exec-path-from-shell-PATH)
+      (make-local-variable 'jedi:server-command)
+      (set 'jedi:server-command
+           (list (executable-find "python") ;; may need help if running from GUI
+                 (cadr default-jedi-server-command))))
 
     ;; Now hook everything up
     ;; Hook up to autocomplete
     (add-to-list 'ac-sources 'ac-source-jedi-direct)
-
-    ;; Global options
-    ;; Don't let tooltip show up automatically
-    (setq jedi:get-in-function-call-delay 10000000)
 
     ;; Enable Jedi setup on mode start
     (add-hook 'python-mode-hook 'jedi:setup)
 
     ;; Buffer-specific server options
     (add-hook 'python-mode-hook
-              (lambda ()
-                (jedi-config:setup-server-args)
-                (jedi-config:maybe-use-system-python)))
+              'jedi-config:setup-server-args)
+    (when jedi-config:use-system-python
+      (add-hook 'python-mode-hook
+                'jedi-config:set-python-executable))
+
+    ;; Don't let tooltip show up automatically
+    (setq jedi:get-in-function-call-delay 10000000)
 
     ;; And custom keybindings
-    (add-hook 'python-mode-hook
-              '(lambda ()
-                 (local-set-key (kbd "M-.") 'jedi:goto-definition)
-                 (local-set-key (kbd "M-,") 'jedi:goto-definition-pop-marker)
-                 (local-set-key (kbd "M-?") 'jedi:show-doc)
-                 (local-set-key (kbd "M-/") 'jedi:get-in-function-call)))
+    (add-hook
+     'python-mode-hook
+     '(lambda ()
+        (local-set-key (kbd "M-.") 'jedi:goto-definition)
+        (local-set-key (kbd "M-,") 'jedi:goto-definition-pop-marker)
+        (local-set-key (kbd "M-?") 'jedi:show-doc)
+        (local-set-key (kbd "M-/") 'jedi:get-in-function-call)))
     ))
