@@ -6,7 +6,7 @@
 (add-to-list 'package-archives
 	     '("melpa" . "http://melpa.milkbox.net/packages/") t)
 
-(defvar local-packages '(auto-complete epc jedi))
+(defvar local-packages '(projectile auto-complete epc jedi))
 
 (defun uninstalled-packages (packages)
   (delq nil
@@ -49,6 +49,26 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 (add-hook
  'after-init-hook
  '(lambda ()
+    ;; Projectile
+    (require 'projectile)
+    (projectile-global-mode)
+
+    ;; Optional config - display completion results vertically
+    (setq projectile-completion-system 'ido)
+    ;; Ido config from:
+    ;; http://www.emacswiki.org/emacs/InteractivelyDoThings
+    (setq ido-decorations
+          (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]"
+                  " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
+
+    (defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
+    (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
+    (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
+      (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
+      (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
+    (add-hook 'ido-setup-hook 'ido-define-keys)
+
+
     ;; Auto-complete
     (require 'auto-complete-config)
     (ac-config-default)
