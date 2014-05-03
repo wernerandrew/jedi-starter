@@ -129,12 +129,14 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
              '())
           vc-root-dir))) ;; default to vc root if init file not given
 
-    ;; This function sets how project root is determined
+    ;; Set this variable to find project root
+    (defvar jedi-config:find-root-function 'get-project-root-with-file)
+
     (defun current-buffer-project-root ()
-      (get-project-root-with-file
-       (current-buffer)
-       jedi-config:vcs-root-sentinel
-       jedi-config:python-module-sentinel))
+      (funcall jedi-config:find-root-function
+               (current-buffer)
+               jedi-config:vcs-root-sentinel
+               jedi-config:python-module-sentinel))
 
     (defun jedi-config:setup-server-args ()
       ;; little helper macro for building the arglist
