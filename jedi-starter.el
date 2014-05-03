@@ -31,12 +31,18 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 (defvar jedi-config:with-virtualenv nil
   "Set to non-nil to point to a particular virtualenv.")
 
+(defvar jedi-config:vcs-root-sentinel ".git")
+
+(defvar jedi-config:python-module-sentinel "__init__.py")
+
+;; Helper functions
+
 ;; Small helper to scrape text from shell output
 (defun get-shell-output (cmd)
   (replace-regexp-in-string "[ \t\n]*$" "" (shell-command-to-string cmd)))
 
 ;; Ensure that PATH is taken from shell
-;; Necessary on some environments if not relying on Jedi server install
+;; Necessary on some environments without virtualenv
 ;; Taken from: http://stackoverflow.com/questions/8606954/path-and-exec-path-set-but-emacs-does-not-find-executable
 
 (defun set-exec-path-from-shell-PATH ()
@@ -46,32 +52,27 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
     (setenv "PATH" path-from-shell)
     (setq exec-path (split-string path-from-shell path-separator))))
 
+;; Package specific initialization
 (add-hook
  'after-init-hook
  '(lambda ()
-    ;; Projectile
+
+    ;; Hack for old(er) Emacs versions
+    (when (< emacs-major-version 24)
+      (setq remote-file-name-inhibit-cache t))
+
     (require 'projectile)
     (projectile-global-mode)
-
-    ;; Optional config - display completion results vertically
-    (setq projectile-completion-system 'ido)
-    ;; Ido config from:
-    ;; http://www.emacswiki.org/emacs/InteractivelyDoThings
-    (setq ido-decorations
-          (quote ("\n-> " "" "\n   " "\n   ..." "[" "]" " [No match]"
-                  " [Matched]" " [Not readable]" " [Too big]" " [Confirm]")))
-
-    (defun ido-disable-line-truncation () (set (make-local-variable 'truncate-lines) nil))
-    (add-hook 'ido-minibuffer-setup-hook 'ido-disable-line-truncation)
-    (defun ido-define-keys () ;; C-n/p is more intuitive in vertical layout
-      (define-key ido-completion-map (kbd "C-n") 'ido-next-match)
-      (define-key ido-completion-map (kbd "C-p") 'ido-prev-match))
-    (add-hook 'ido-setup-hook 'ido-define-keys)
-
 
     ;; Auto-complete
     (require 'auto-complete-config)
     (ac-config-default)
+
+    ;; Uncomment next line if you like the menu right away
+    ;; (setq ac-show-menu-immediately-on-auto-complete t)
+
+    ;; Can also express in terms of ac-delay var, e.g.:
+    ;;   (setq ac-auto-show-menu (* ac-delay 2))
 
     ;; Jedi
     (require 'jedi)
@@ -128,10 +129,6 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
              '())
           vc-root-dir))) ;; default to vc root if init file not given
 
-    ;; And some customizations
-    (defvar jedi-config:vcs-root-sentinel ".git")
-    (defvar jedi-config:python-module-sentinel "__init__.py")
-
     ;; This function sets how project root is determined
     (defun current-buffer-project-root ()
       (get-project-root-with-file
@@ -187,6 +184,8 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
 
     ;; Don't let tooltip show up automatically
     (setq jedi:get-in-function-call-delay 10000000)
+    ;; Start completion at method dot
+    (setq jedi:complete-on-dot t)
     ;; Use custom keybinds
     (add-hook 'python-mode-hook 'jedi-config:setup-keys)
 
