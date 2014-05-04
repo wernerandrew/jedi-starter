@@ -57,12 +57,12 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
  'after-init-hook
  '(lambda ()
 
-    ;; Hack for old(er) Emacs versions
-    (when (< emacs-major-version 24)
-      (setq remote-file-name-inhibit-cache t))
-
     (require 'projectile)
     (projectile-global-mode)
+
+    ;; Hack for old(er) Emacs versions
+    (when (not (boundp 'remote-file-name-inhibit-cache))
+      (setq remote-file-name-inhibit-cache t))
 
     ;; Auto-complete
     (require 'auto-complete-config)
