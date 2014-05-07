@@ -47,3 +47,23 @@ jedi:goto-definition            | C-c .   | M-.
 jedi:goto-definition-pop-marker | C-c ,   | M-,
 jedi:show-doc                   | C-c ?   | M-?
 jedi:get-in-function-call       | None    | M-/
+
+### Tips for non-virtualenv users
+
+If you can't use virtualenv (which may be the case for
+Anaconda users), you may want to try the following:
+
+1.  You'll still need pip to install some dependencies; try `easy_install pip` if you don't have it.
+
+2.  You'll need to install jedi and epc manually:
+
+        $ pip install epc
+        $ pip install jedi
+    
+3.  Right after `(require 'jedi)` in your init file, include the following:
+
+        (setq jedi-config:use-system-python t)
+
+(Note that this all assumes you're using substantially all of the 
+configuration code in `jedi-config.el`, including helper functions
+and defined config variables.)
