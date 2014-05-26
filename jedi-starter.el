@@ -57,12 +57,10 @@ May be necessary for some GUI environments (e.g., Mac OS X)")
  'after-init-hook
  '(lambda ()
 
-    (require 'projectile)
-    (projectile-global-mode)
-
-    ;; Hack for old(er) Emacs versions
-    (when (not (boundp 'remote-file-name-inhibit-cache))
-      (setq remote-file-name-inhibit-cache t))
+    ;; Looks like you need Emacs 24 for projectile
+    (unless (< emacs-major-version 24)
+      (require 'projectile)
+      (projectile-global-mode))
 
     ;; Auto-complete
     (require 'auto-complete-config)

@@ -18,13 +18,33 @@ VAGRANT_HOME=/home/vagrant
 
 # install package.el
 cd $VAGRANT_HOME
-[ -d .emacs.d ] || mkdir .emacs.d
-cd .emacs.d
-curl -XGET -O http://repo.or.cz/w/emacs.git/blob_plain/1a0a666f941c99882093d7bd08ced15033bc3f0c:/lisp/emacs-lisp/package.el
-sudo chown -R vagrant:vagrant $VAGRANT_HOME/.emacs.d
 
 # link to our .emacs file
 sudo -u vagrant ln -s /vagrant/jedi-starter.el $VAGRANT_HOME/.emacs
 
 # get emacs
-$INSTALL emacs
+
+# build dependencies
+$INSTALL build-essential
+$INSTALL libgtk-3-dev
+$INSTALL libgif-dev libxpm-dev
+$INSTALL texinfo
+$INSTALL libtiff4-dev
+
+# download emacs
+TEMPDIR=install-temp
+mkdir $TEMPDIR
+
+# compile
+EMACSBASE=emacs-24.3
+EMACSPKG="$EMACSBASE.tar.gz"
+curl -XGET -O "http://ftp.gnu.org/gnu/emacs/$EMACSPKG"
+tar xzvf $EMACSPKG
+cd $EMACSBASE
+./configure
+make
+sudo make install
+
+# and cleanup
+cd $VAGRANT_HOME
+rm -rf $TEMPDIR
