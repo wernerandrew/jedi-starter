@@ -27,11 +27,7 @@ sudo -u vagrant ln -sf /vagrant/jedi-starter.el $VAGRANT_HOME/.emacs.d/init.el
 
 # build dependencies
 $INSTALL build-essential
-$INSTALL texinfo libtinfo-dev libncurses5-dev
-
-# download emacs
-TEMPDIR=install-temp
-mkdir $TEMPDIR
+$INSTALL texinfo libtinfo-dev
 
 # compile
 EMACSBASE=emacs-24.5
@@ -49,4 +45,4 @@ sudo make install
 
 # and cleanup
 cd $VAGRANT_HOME
-rm -rf $TEMPDIR
+rm -rf $EMACSBASE
