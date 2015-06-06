@@ -1,6 +1,5 @@
 ;; Package setup
 
-(add-to-list 'load-path "~/.emacs.d") ; to find Emacs 23 package.el
 (require 'package)
 (package-initialize)
 (add-to-list 'package-archives
